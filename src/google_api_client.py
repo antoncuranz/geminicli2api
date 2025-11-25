@@ -166,9 +166,16 @@ def _handle_streaming_response(resp) -> StreamingResponse:
                             
                             try:
                                 obj = json.loads(chunk)
+                                print(chunk)
                                 
                                 if "response" in obj:
                                     response_chunk = obj["response"]
+                                    response_json = json.dumps(response_chunk, separators=(',', ':'))
+                                    response_line = f"data: {response_json}\n\n"
+                                    yield response_line.encode('utf-8', "ignore")
+                                    await asyncio.sleep(0)
+                                elif "text" in obj:
+                                    response_chunk = obj["text"]
                                     response_json = json.dumps(response_chunk, separators=(',', ':'))
                                     response_line = f"data: {response_json}\n\n"
                                     yield response_line.encode('utf-8', "ignore")
